@@ -25,5 +25,6 @@ interface RouteConstant
     const METHOD_PUT = 'put';
     const METHOD_DELETE = 'delete';
     const METHOD_RESTFUL = ['get', 'post', 'put', 'delete'];
+    const METHOD_ALL = ['get', 'post', 'put', 'delete', 'patch'];
     
 }
