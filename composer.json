@@ -1,0 +1,31 @@
+{
+    "name": "calject/lann-route",
+    "description":"lann-route",
+    "license": "MIT",
+	"authors": [
+        {
+            "name": "沧澜",
+            "email": "lryhuimeng@163.com"
+        }
+    ],
+	"keywords": [
+        "calject",
+        "laravel",
+        "annotation",
+        "route"
+    ],
+    "require": {
+		"php": "^7.0",
+        "calject/productivity": "^0.2.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "Calject\\LannRoute\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Calject\\LannRoute\\Test\\": "test"
+        }
+    }
+}
