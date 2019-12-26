@@ -1,70 +1,5 @@
 # lann-route
 
-## Plan
-
-### v1.2 (待定...)
-
-* 添加路由配置`route.ini`配置文件，作用于文件夹下所有控制器类
-    * 可以使用已定义的所有作用于CLASS级别的`tag`，如`@restful`、`@file()`、`@middleware()`
-    * 子级目录将覆盖父级目录的定义
-    * 类中定义的`@tag(...)`将覆盖`route.ini`的配置
-        * 如`route.ini`中定义`prefix=api`, class中添加`@prefix(test)`,最终class的`prefix`为`test/...`
-
-##### 待定模式`@tag{}`、`@tag[]`
-
-* 添加`@tag{...}`模式,标识`tag`相关内容为追加, 不覆盖`php.ini`及上级类的`@tag`
-    * 支持`tag`
-        * `@method`、`@middleware`、`@prefix`、`@file`、`@env`
-    * 如`route.ini`中定义`prefix=api`, class中添加`@prefix{test}`,最终class的`prefix`为`api/test/...`
-
-* 添加`@tag[...]`模式，标识`tag`相关内容为删除, 删除其上层相关配置
-    * 如`route.ini`中定义`middleware=api,query`, class中添加`@middleware[api]`,最终class的`middleware`为`query`
-    * 如`TestController`注释中添加`@method(get,post)`, function注释中添加`@method[post]`,最终function请求`method`为`get`
-
-* 示例:
-```
-method=get,post,put,delete
-prefix=annotation
-middleware=api
-...
-```
-
-### v1.1 (开发...)
-
-* 添加`@env(...)`作用环境
-    * 作用环境: CLASS 、FUNCTION
-    * 示例: @env(produce) | @env(local,develop)
-
-* 添加根据路由注解生成路由文件功能
-    * 添加命令`php artisan calject:route:file` 根据路由注解生成文件
-    * 添加tag`@file(...)` : 生成路由的文件名(作用于当前类)
-        * 作用范围: CLASS
-        * 示例: @file(route.php) | @file(test/route.php) 将在`routes`目录下生成对应的路由文件
-
-* 示例
-
-```php
-<?php
-
-/**
- * Class TestController
- * @env(produce,develop,local)  限定produce,develop,local环境生效
- * @file(route.php)
- */
-class TestController extends Controller
-{
-    /**
-     * @return ResponseFactory|Response
-     * @route(uri='test', method='get')
-     * @env(local) 限定local生效
-     */
-    public function test()
-    {
-        return response('test');
-    }
-}
-```
-
 ## 版本说明
 
 ### v1.0
@@ -475,6 +410,71 @@ class TestController extends Controller
      * @route(uri='test', method='get')
      */
     public function test(Request $request)
+    {
+        return response('test');
+    }
+}
+```
+
+## Plan
+
+### v1.2 (待定...)
+
+* 添加路由配置`route.ini`配置文件，作用于文件夹下所有控制器类
+    * 可以使用已定义的所有作用于CLASS级别的`tag`，如`@restful`、`@file()`、`@middleware()`
+    * 子级目录将覆盖父级目录的定义
+    * 类中定义的`@tag(...)`将覆盖`route.ini`的配置
+        * 如`route.ini`中定义`prefix=api`, class中添加`@prefix(test)`,最终class的`prefix`为`test/...`
+
+##### 待定模式`@tag{}`、`@tag[]`
+
+* 添加`@tag{...}`模式,标识`tag`相关内容为追加, 不覆盖`php.ini`及上级类的`@tag`
+    * 支持`tag`
+        * `@method`、`@middleware`、`@prefix`、`@file`、`@env`
+    * 如`route.ini`中定义`prefix=api`, class中添加`@prefix{test}`,最终class的`prefix`为`api/test/...`
+
+* 添加`@tag[...]`模式，标识`tag`相关内容为删除, 删除其上层相关配置
+    * 如`route.ini`中定义`middleware=api,query`, class中添加`@middleware[api]`,最终class的`middleware`为`query`
+    * 如`TestController`注释中添加`@method(get,post)`, function注释中添加`@method[post]`,最终function请求`method`为`get`
+
+* 示例:
+```
+method=get,post,put,delete
+prefix=annotation
+middleware=api
+...
+```
+
+### v1.1 (开发...)
+
+* 添加`@env(...)`作用环境
+    * 作用环境: CLASS 、FUNCTION
+    * 示例: @env(produce) | @env(local,develop)
+
+* 添加根据路由注解生成路由文件功能
+    * 添加命令`php artisan calject:route:file` 根据路由注解生成文件
+    * 添加tag`@file(...)` : 生成路由的文件名(作用于当前类)
+        * 作用范围: CLASS
+        * 示例: @file(route.php) | @file(test/route.php) 将在`routes`目录下生成对应的路由文件
+
+* 示例
+
+```php
+<?php
+
+/**
+ * Class TestController
+ * @env(produce,develop,local)  限定produce,develop,local环境生效
+ * @file(route.php)
+ */
+class TestController extends Controller
+{
+    /**
+     * @return ResponseFactory|Response
+     * @route(uri='test', method='get')
+     * @env(local) 限定local生效
+     */
+    public function test()
     {
         return response('test');
     }
