@@ -1,7 +1,7 @@
 <?php
 /**
  * Author: 沧澜
- * Date: 2019-12-17
+ * Date: 2019-12-31
  */
 
 namespace Calject\LannRoute\Components\Tag;
@@ -12,11 +12,10 @@ use Calject\LannRoute\Constant\RouteConstant;
 use Calject\LannRoute\Contracts\AbsAnnotationTag;
 
 /**
- * Class Prefix
+ * Class File
  * @package Calject\LannRoute\Components\Tag
- * @example prefix(xxx) | prefix('xxx')
  */
-class Prefix extends AbsAnnotationTag
+class File extends AbsAnnotationTag
 {
     
     /**
@@ -26,11 +25,11 @@ class Prefix extends AbsAnnotationTag
      */
     public function handle($route, $params)
     {
-        is_string($params) && $route->prefix($params);
+        // TODO: Implement handle() method.
     }
     
     /**
-     * 作用范围, 可选: class
+     * 作用范围, 可选: class, function
      * @return array|string
      */
     public function scope()

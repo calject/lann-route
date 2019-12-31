@@ -6,17 +6,12 @@
 
 namespace Calject\LannRoute;
 
-use Calject\LannRoute\Components\Model\RouteClassData;
-use Calject\LannRoute\Components\Model\RouteFuncData;
-use Calject\LannRoute\Components\RouteRegister;
-use Calject\LannRoute\Constant\RouteConstant;
+use Calject\LannRoute\Components\Model\RouteFile;
+use Calject\LannRoute\Components\RouteManager;
 use Calject\LannRoute\Contracts\AnnotationTagInterface;
 use CalJect\Productivity\Components\DataProperty\CallDataProperty;
 use CalJect\Productivity\Contracts\DataProperty\TCallDataPropertyByName;
-use CalJect\Productivity\Utils\GeneratorFileLoad;
 use Illuminate\Support\Facades\Route;
-use ReflectionClass;
-use ReflectionMethod;
 
 /**
  * Class AnnotationRoute
@@ -42,11 +37,6 @@ class AnnotationRoute extends CallDataProperty
     private $namespace = 'App\Http\Controllers';
     
     /**
-     * @var RouteRegister
-     */
-    protected $routeRegister;
-    
-    /**
      * @note 生效环境
      * @var mixed
      * @explain array|string 传入数组或者字符 默认为所有环境生效
@@ -55,43 +45,17 @@ class AnnotationRoute extends CallDataProperty
     protected $envs;
     
     /**
-     * @note 注解查询的路径(相对路径)
-     * @var mixed
-     * @explain array|string 传入数组或者字符 默认为空查询app/Http/Controllers下所有控制器文件
-     * @example Test 、 User 、['Test'、 'User'] 、 ...
+     * @var RouteManager
      */
-    protected $controllers;
+    protected $routeManager;
+    
     
     /**
-     * init
+     * AnnotationRoute constructor.
      */
-    protected function _init()
+    public function _init()
     {
-        $this->routeRegister = new RouteRegister();
-        (new GeneratorFileLoad(__DIR__ . '/Components/Tag'))->eachFiles(function ($tagFile) {
-            $className = 'Calject\LannRoute\Components\Tag\\' . str_replace('.php', '', basename($tagFile));
-            if (!class_exists($className) || !is_subclass_of($className, 'Calject\LannRoute\Contracts\AnnotationTagInterface')) {
-                return;
-            }
-            $this->routeRegister->register(new $className);
-        });
-    }
-    
-    /**
-     * @explain 遍历控制器文件
-     */
-    public function mapRefRoutes()
-    {
-        if ($this->envs && !in_array(app('env'), (array)$this->envs)) {
-            return;
-        }
-        if ($this->controllers) {
-            array_map(function ($path) {
-                $this->registerRoutes($path);
-            }, (array)$this->controllers);
-        } else {
-            $this->registerRoutes(app_path('Http/Controllers'));
-        }
+        $this->routeManager = new RouteManager(app_path('Http/Controllers'), $this->namespace);
     }
     
     /**
@@ -100,123 +64,70 @@ class AnnotationRoute extends CallDataProperty
      */
     public function register(AnnotationTagInterface $annotationTag)
     {
-        $this->routeRegister->register($annotationTag);
+        $this->routeManager->register($annotationTag);
         return $this;
     }
     
     /**
      * @param AnnotationTagInterface[] $tags
-     * @return AnnotationRoute
+     * @return $this
      */
     public function registers(array $tags)
     {
-        $this->routeRegister->registers($tags);
+        $this->routeManager->registers($tags);
         return $this;
     }
     
-    /*---------------------------------------------- protected ----------------------------------------------*/
+    /**
+     * @return RouteManager
+     */
+    public function getRouteManager(): RouteManager
+    {
+        return $this->routeManager;
+    }
     
     /**
-     * @param $controllerPath
+     * @explain 遍历控制器文件
      */
-    protected function registerRoutes($controllerPath)
+    public function mapRefRoutes()
     {
-        (new GeneratorFileLoad($controllerPath))->eachFiles(function ($filePath) use ($controllerPath) {
-            $className = str_replace('.php', '', str_replace('/', '\\', str_replace($controllerPath, $this->namespace, $filePath)));
-            if (!class_exists($className) || !is_subclass_of($className, 'App\Http\Controllers\Controller')) {
-                return;
+        $this->registerRoutes();
+    }
+    
+    /**
+     * 注册路由
+     */
+    public function registerRoutes()
+    {
+        if ($this->envs && !in_array(app('env'), (array)$this->envs)) {
+            return;
+        }
+        array_map(function (RouteFile $routeFile) {
+            $classTagData = $routeFile->getRouteClass();
+            $methodRoutes = $routeFile->getRouteFunctions();
+            $router = Route::namespace($this->namespace);
+            if ($classParams = $classTagData->getOther()) {
+                foreach ($classParams as $property => $values) {
+                    $router->{$property}($values);
+                }
             }
-            $classTagData = new RouteClassData();
-            /* ======== 解析路由注解 ======== */
-            $refClass = new ReflectionClass($className);
-            /* ======== 处理class tags ======== */
-            $this->tagHandle($refClass->getDocComment(), RouteConstant::SCOPE_CLASS, $classTagData);
-            array_map(function (ReflectionMethod $refMethod) use (&$methodRoutes, $className, $classTagData) {
-                if ($refMethod->isPublic() && $refMethod->class == $className) {
-                    $funcTagData = new RouteFuncData();
-                    $funcTagData->method()->set($classTagData->getMethod());
-                    $funcTagData->action(ltrim(str_replace($this->namespace, '', $className) . '@' . $refMethod->getName(), '\\'));
-                    $methodRoutes[] = $this->tagHandle($refMethod->getDocComment(), RouteConstant::SCOPE_FUNCTION, $funcTagData);
-                }
-            }, $refClass->getMethods());
-            /* ======== 注册路由 ======== */
-            if ($methodRoutes) {
-                $router = Route::namespace($this->namespace);
-                if ($classParams = $classTagData->getOther()) {
-                    foreach ($classParams as $property => $values) {
-                        $router->{$property}($values);
-                    }
-                }
-                $classTagData->getPrefix() && $router->prefix($classTagData->getPrefix());
-                $classTagData->getMiddleware() && $router->middleware($classTagData->getMiddleware());
-                $router->group(function () use ($methodRoutes) {
-                    array_map(function ($funcTag) {
-                        foreach ($funcTag->getUri() as $uri) {
-                            if ($funcTag->getMethods() && $uri ) {
-                                $route = Route::match($funcTag->getMethods(), $uri, $funcTag->getAction());
-                                $route->name($funcTag->getName());
-                                $route->prefix($funcTag->getPrefix());
-                                $route->middleware($funcTag->getMiddleware());
-                                foreach ($funcTag->getOther() as $key => $value) {
-                                    $route->{$key}($value);
-                                }
+            $classTagData->getPrefix() && $router->prefix($classTagData->getPrefix());
+            $classTagData->getMiddleware() && $router->middleware($classTagData->getMiddleware());
+            $router->group(function () use ($methodRoutes) {
+                array_map(function ($funcTag) {
+                    foreach ($funcTag->getUri() as $uri) {
+                        if ($funcTag->getMethod() && $uri ) {
+                            $route = Route::match($funcTag->getMethod(), $uri, $funcTag->getAction());
+                            $route->name($funcTag->getName());
+                            $route->prefix($funcTag->getPrefix());
+                            $route->middleware($funcTag->getMiddleware());
+                            foreach ($funcTag->getOther() as $key => $value) {
+                                $route->{$key}($value);
                             }
                         }
-                    }, $methodRoutes);
-                });
-            }
-        });
+                    }
+                }, $methodRoutes);
+            });
+        }, $this->routeManager->getRouteFiles());
     }
-    
-    /**
-     * @param string $docComment
-     * @param string $scope
-     * @param RouteFuncData|RouteClassData $tagData
-     * @return RouteClassData|RouteFuncData
-     */
-    protected function tagHandle(string $docComment, string $scope, $tagData)
-    {
-        if ($classTags = $this->matchTags($docComment)) {
-            foreach ($classTags as $tag => $content) {
-                if ($tagObj = $this->routeRegister->get($tag, $scope)) {
-                    $tagObj->handle($tagData, $content);
-                }
-            }
-        }
-        return $tagData;
-    }
-    
-    /**
-     * 获取所有tag(@key(xxx), @key(method='xxx', prefix='xxx'), ...)
-     * @param string $docComment
-     * @param null $default
-     * @return array|null
-     */
-    protected function matchTags(string $docComment, $default = null)
-    {
-        if (preg_match_all("/\*?[ ]*@(\w+)\(['\"]?([^()]*?)['\"]?\)\n/s", $docComment, $matchs) && isset($matchs[2])) {
-            foreach ($matchs[2] as $index => $content) {
-                $tags[$matchs[1][$index]] = $this->toKeyValues($content);
-            }
-            return $tags ?? $default;
-        } else {
-            return $default;
-        }
-    }
-    
-    /**
-     * 将字符串(key='values')转换为键值对
-     * @param string $docComment
-     * @return array|mixed
-     * @example a='a', b='b' ==> ['a' => 'a', 'b' => 'b']
-     */
-    protected function toKeyValues(string $docComment)
-    {
-        if (preg_match_all("/(\w*)=['\"]*([^'\"()]*)['\"]*/", $docComment, $matchs) && $matchs[1]) {
-            return array_combine($matchs[1], $matchs[2]);
-        } else {
-            return $docComment;
-        }
-    }
-    
 }

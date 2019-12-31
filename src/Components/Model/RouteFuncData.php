@@ -6,27 +6,20 @@
 
 namespace Calject\LannRoute\Components\Model;
 
-
 use Calject\LannRoute\Components\Items\ArrayItem;
-use Calject\LannRoute\Components\Items\KeyItem;
+use Calject\LannRoute\Contracts\AbsRouteData;
 use Calject\LannRoute\Contracts\ItemInterface;
 
-class RouteFuncData
+/**
+ * Class RouteFuncData
+ * @package Calject\LannRoute\Components\Model
+ */
+class RouteFuncData extends AbsRouteData
 {
     /**
      * @var ItemInterface
      */
-    protected $method;
-    
-    /**
-     * @var ItemInterface
-     */
     protected $uri;
-    
-    /**
-     * @var ItemInterface
-     */
-    protected $middleware;
     
     /**
      * @var string
@@ -36,38 +29,18 @@ class RouteFuncData
     /**
      * @var string
      */
-    protected $prefix = '';
-    
-    /**
-     * @var string
-     */
     protected $name = '';
     
     /**
-     * @var ItemInterface
+     * init
+     * @return mixed|void
      */
-    protected $other;
-    
-    /**
-     * AnnotationCache constructor.
-     */
-    public function __construct()
+    protected function init()
     {
-        $this->method = new ArrayItem();
         $this->uri = new ArrayItem();
-        $this->middleware = new ArrayItem();
-        $this->other = new KeyItem();
     }
     
     /*---------------------------------------------- set ----------------------------------------------*/
-    
-    /**
-     * @return ItemInterface
-     */
-    public function method(): ItemInterface
-    {
-        return $this->method;
-    }
     
     /**
      * @return ItemInterface
@@ -78,30 +51,12 @@ class RouteFuncData
     }
     
     /**
-     * @return ItemInterface
-     */
-    public function middleware(): ItemInterface
-    {
-        return $this->middleware;
-    }
-    
-    /**
      * @param string $action
      * @return $this
      */
     public function action(string $action)
     {
         $this->action = $action;
-        return $this;
-    }
-    
-    /**
-     * @param string $prefix
-     * @return $this
-     */
-    public function prefix(string $prefix)
-    {
-        $this->prefix = $prefix;
         return $this;
     }
     
@@ -116,24 +71,7 @@ class RouteFuncData
     }
     
     
-    /**
-     * @return ItemInterface
-     */
-    public function other(): ItemInterface
-    {
-        return $this->other;
-    }
-    
-    
     /*---------------------------------------------- get ----------------------------------------------*/
-    
-    /**
-     * @return array
-     */
-    public function getMethods(): array
-    {
-        return $this->method->all();
-    }
     
     /**
      * @return array
@@ -141,14 +79,6 @@ class RouteFuncData
     public function getUri(): array
     {
         return $this->uri->all();
-    }
-    
-    /**
-     * @return array
-     */
-    public function getMiddleware(): array
-    {
-        return $this->middleware->all();
     }
     
     /**
@@ -162,25 +92,9 @@ class RouteFuncData
     /**
      * @return string
      */
-    public function getPrefix(): string
-    {
-        return $this->prefix;
-    }
-    
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
-    }
-    
-    /**
-     * @return array
-     */
-    public function getOther(): array
-    {
-        return $this->other->all();
     }
     
 }

@@ -6,62 +6,19 @@
 
 namespace Calject\LannRoute\Components\Model;
 
+use Calject\LannRoute\Contracts\AbsRouteData;
 
-use Calject\LannRoute\Components\Items\ArrayItem;
-use Calject\LannRoute\Components\Items\KeyItem;
-use Calject\LannRoute\Contracts\ItemInterface;
-
-class RouteClassData
+/**
+ * Class RouteClassData
+ * @package Calject\LannRoute\Components\Model
+ */
+class RouteClassData extends AbsRouteData
 {
-    
-    /**
-     * @var ItemInterface
-     */
-    protected $method;
-    
-    /**
-     * @var ItemInterface
-     */
-    protected $middleware;
     
     /**
      * @var string
      */
     protected $prefix = '';
-    
-    /**
-     * @var ItemInterface
-     */
-    protected $other;
-    
-    
-    /**
-     * RouteClassData constructor.
-     */
-    public function __construct()
-    {
-        $this->method = new ArrayItem();
-        $this->middleware = new ArrayItem();
-        $this->other = new KeyItem();
-    }
-    
-    /*---------------------------------------------- set ----------------------------------------------*/
-    
-    /**
-     * @return ItemInterface
-     */
-    public function method(): ItemInterface
-    {
-        return $this->method;
-    }
-    
-    /**
-     * @return ItemInterface
-     */
-    public function middleware(): ItemInterface
-    {
-        return $this->middleware;
-    }
     
     /**
      * @param string $prefix
@@ -74,46 +31,11 @@ class RouteClassData
     }
     
     /**
-     * @return ItemInterface
-     */
-    public function other(): ItemInterface
-    {
-        return $this->other;
-    }
-    
-    /*---------------------------------------------- get ----------------------------------------------*/
-    
-    
-    /**
-     * @return array
-     */
-    public function getMethod(): array
-    {
-        return $this->method->all();
-    }
-    
-    /**
-     * @return array
-     */
-    public function getMiddleware(): array
-    {
-        return $this->middleware->all();
-    }
-    
-    /**
      * @return string
      */
     public function getPrefix(): string
     {
         return $this->prefix;
-    }
-    
-    /**
-     * @return array
-     */
-    public function getOther(): array
-    {
-        return $this->other->all();
     }
     
 }
