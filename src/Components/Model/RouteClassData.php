@@ -14,28 +14,27 @@ use Calject\LannRoute\Contracts\AbsRouteData;
  */
 class RouteClassData extends AbsRouteData
 {
-    
     /**
      * @var string
      */
-    protected $prefix = '';
+    protected $file;
     
     /**
-     * @param string $prefix
+     * @param string $file
      * @return $this
      */
-    public function prefix(string $prefix)
+    public function file(string $file)
     {
-        $this->prefix = $prefix;
+        $this->file = $file;
         return $this;
     }
     
     /**
      * @return string
      */
-    public function getPrefix(): string
+    public function getFile(): string
     {
-        return $this->prefix;
+        return $this->file;
     }
     
 }

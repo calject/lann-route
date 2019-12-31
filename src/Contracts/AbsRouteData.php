@@ -22,6 +22,11 @@ abstract class AbsRouteData
     protected $prefix = '';
     
     /**
+     * @var array
+     */
+    protected $envs = [];
+    
+    /**
      * @var ItemInterface
      */
     protected $method;
@@ -69,6 +74,16 @@ abstract class AbsRouteData
     }
     
     /**
+     * @param array $envs
+     * @return $this
+     */
+    public function envs(array $envs)
+    {
+        $this->envs = $envs;
+        return $this;
+    }
+    
+    /**
      * @return ItemInterface
      */
     public function method(): ItemInterface
@@ -100,6 +115,14 @@ abstract class AbsRouteData
     public function getPrefix(): string
     {
         return $this->prefix;
+    }
+    
+    /**
+     * @return array
+     */
+    public function getEnvs(): array
+    {
+        return $this->envs;
     }
     
     /**

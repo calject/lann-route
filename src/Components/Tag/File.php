@@ -14,6 +14,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationTag;
 /**
  * Class File
  * @package Calject\LannRoute\Components\Tag
+ * @example @file(api) | @file(api.php) | @file(test/api.php) | @file('test/api') | ...
  */
 class File extends AbsAnnotationTag
 {
@@ -25,7 +26,7 @@ class File extends AbsAnnotationTag
      */
     public function handle($route, $params)
     {
-        // TODO: Implement handle() method.
+        $route->file($params);
     }
     
     /**

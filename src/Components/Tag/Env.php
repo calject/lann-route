@@ -14,6 +14,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationTag;
 /**
  * Class Env
  * @package Calject\LannRoute\Components\Tag
+ * @example @env(local) | @env('local,develop,...') | @env(all)
  */
 class Env extends AbsAnnotationTag
 {
@@ -25,7 +26,11 @@ class Env extends AbsAnnotationTag
      */
     public function handle($route, $params)
     {
-        $route->method()->set($this->getArray($params));
+        if ('all' === trim($params)) {
+            $route->envs([]);
+        } else {
+            $route->envs($this->getArray($params));
+        }
     }
     
     /**

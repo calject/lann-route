@@ -8,6 +8,7 @@ namespace Calject\LannRoute;
 
 use Calject\LannRoute\Components\Model\RouteFile;
 use Calject\LannRoute\Components\RouteManager;
+use Calject\LannRoute\Contracts\AbsRouteData;
 use Calject\LannRoute\Contracts\AnnotationTagInterface;
 use CalJect\Productivity\Components\DataProperty\CallDataProperty;
 use CalJect\Productivity\Contracts\DataProperty\TCallDataPropertyByName;
@@ -37,12 +38,18 @@ class AnnotationRoute extends CallDataProperty
     private $namespace = 'App\Http\Controllers';
     
     /**
+     * 当前env环境配置
+     * @var string
+     */
+    protected $appEnv = '';
+    
+    /**
      * @note 生效环境
      * @var mixed
      * @explain array|string 传入数组或者字符 默认为所有环境生效
      * @example local 、 produce 、 ['local', 'develop'] 、 ...
      */
-    protected $envs;
+    protected $envs = [];
     
     /**
      * @var RouteManager
@@ -55,6 +62,7 @@ class AnnotationRoute extends CallDataProperty
      */
     public function _init()
     {
+        $this->appEnv = app('env');
         $this->routeManager = new RouteManager(app_path('Http/Controllers'), $this->namespace);
     }
     
@@ -99,12 +107,15 @@ class AnnotationRoute extends CallDataProperty
      */
     public function registerRoutes()
     {
-        if ($this->envs && !in_array(app('env'), (array)$this->envs)) {
+        if ($this->envs && !in_array($this->appEnv, (array)$this->envs)) {
             return;
         }
         array_map(function (RouteFile $routeFile) {
             $classTagData = $routeFile->getRouteClass();
             $methodRoutes = $routeFile->getRouteFunctions();
+            if (!$this->checkEnvs($classTagData)) {
+                return;
+            }
             $router = Route::namespace($this->namespace);
             if ($classParams = $classTagData->getOther()) {
                 foreach ($classParams as $property => $values) {
@@ -115,14 +126,16 @@ class AnnotationRoute extends CallDataProperty
             $classTagData->getMiddleware() && $router->middleware($classTagData->getMiddleware());
             $router->group(function () use ($methodRoutes) {
                 array_map(function ($funcTag) {
-                    foreach ($funcTag->getUri() as $uri) {
-                        if ($funcTag->getMethod() && $uri ) {
-                            $route = Route::match($funcTag->getMethod(), $uri, $funcTag->getAction());
-                            $route->name($funcTag->getName());
-                            $route->prefix($funcTag->getPrefix());
-                            $route->middleware($funcTag->getMiddleware());
-                            foreach ($funcTag->getOther() as $key => $value) {
-                                $route->{$key}($value);
+                    if ($this->checkEnvs($funcTag)) {
+                        foreach ($funcTag->getUri() as $uri) {
+                            if ($funcTag->getMethod() && $uri ) {
+                                $route = Route::match($funcTag->getMethod(), $uri, $funcTag->getAction());
+                                $route->name($funcTag->getName());
+                                $route->prefix($funcTag->getPrefix());
+                                $route->middleware($funcTag->getMiddleware());
+                                foreach ($funcTag->getOther() as $key => $value) {
+                                    $route->{$key}($value);
+                                }
                             }
                         }
                     }
@@ -130,4 +143,14 @@ class AnnotationRoute extends CallDataProperty
             });
         }, $this->routeManager->getRouteFiles());
     }
+    
+    /**
+     * @param AbsRouteData $data
+     * @return bool
+     */
+    protected function checkEnvs(AbsRouteData $data): bool
+    {
+        return !$data->getEnvs() || in_array($this->appEnv, $data->getEnvs());
+    }
+    
 }
