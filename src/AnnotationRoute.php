@@ -10,6 +10,7 @@ use Calject\LannRoute\Components\Model\RouteFile;
 use Calject\LannRoute\Components\RouteManager;
 use Calject\LannRoute\Contracts\AbsRouteData;
 use Calject\LannRoute\Contracts\AnnotationTagInterface;
+use Calject\LannRoute\Helper\RouteDataHelper;
 use CalJect\Productivity\Components\DataProperty\CallDataProperty;
 use CalJect\Productivity\Contracts\DataProperty\TCallDataPropertyByName;
 use Illuminate\Support\Facades\Route;
@@ -113,7 +114,7 @@ class AnnotationRoute extends CallDataProperty
         array_map(function (RouteFile $routeFile) {
             $classTagData = $routeFile->getRouteClass();
             $methodRoutes = $routeFile->getRouteFunctions();
-            if (!$this->checkEnvs($classTagData)) {
+            if (!RouteDataHelper::checkEnvs($this->appEnv,$classTagData)) {
                 return;
             }
             $router = Route::namespace($this->namespace);
@@ -126,7 +127,7 @@ class AnnotationRoute extends CallDataProperty
             $classTagData->getMiddleware() && $router->middleware($classTagData->getMiddleware());
             $router->group(function () use ($methodRoutes) {
                 array_map(function ($funcTag) {
-                    if ($this->checkEnvs($funcTag)) {
+                    if (RouteDataHelper::checkEnvs($this->appEnv, $funcTag)) {
                         foreach ($funcTag->getUri() as $uri) {
                             if ($funcTag->getMethod() && $uri ) {
                                 $route = Route::match($funcTag->getMethod(), $uri, $funcTag->getAction());
@@ -142,15 +143,6 @@ class AnnotationRoute extends CallDataProperty
                 }, $methodRoutes);
             });
         }, $this->routeManager->getRouteFiles());
-    }
-    
-    /**
-     * @param AbsRouteData $data
-     * @return bool
-     */
-    protected function checkEnvs(AbsRouteData $data): bool
-    {
-        return !$data->getEnvs() || in_array($this->appEnv, $data->getEnvs());
     }
     
 }
