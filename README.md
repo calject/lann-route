@@ -1,5 +1,7 @@
 # lann-route
 
+[![PHP version](https://badge.fury.io/ph/calject%2Flann-route.svg)](https://badge.fury.io/ph/calject%2Flann-route)
+
 ## 版本说明
 
 ### v1.0
