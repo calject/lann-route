@@ -1,7 +1,7 @@
 # lann-route
 
 [![PHP version](https://badge.fury.io/ph/calject%2Flann-route.svg)](https://badge.fury.io/ph/calject%2Flann-route)
-![license](https://img.shields.io/packagist/l/calject/lann-route)
+[![license](https://img.shields.io/packagist/l/calject/lann-route)](https://github.com/calject/lann-route/blob/master/LICENSE)
 
 ## 版本说明
 
