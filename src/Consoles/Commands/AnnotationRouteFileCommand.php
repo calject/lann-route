@@ -56,11 +56,22 @@ class AnnotationRouteFileCommand extends Command
             if (!RouteDataHelper::checkEnvs($optEnv, $classRoute)) {
                 return;
             }
+            $filePath = $classRoute->getFile();
             // TODO: get route file group
             
             // TODO: write
             
         }, $routeManager->getRouteFiles());
+        
+        if ($files) {
+            foreach ($files as $path => $content ) {
+                if (file_exists($path)) {
+                    echo "文件{$path}已存在.";
+                } else {
+                    file_put_contents($path, $content);
+                }
+            }
+        }
     }
     
     /**

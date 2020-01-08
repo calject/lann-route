@@ -27,5 +27,12 @@
         "psr-4": {
             "Calject\\LannRoute\\Test\\": "test"
         }
+    },
+    "extra":{
+        "laravel":{
+            "providers": [
+                "Calject\\LannRoute\\Providers\\CommandsProvider"
+            ]
+        }
     }
 }

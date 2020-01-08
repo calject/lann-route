@@ -26,7 +26,7 @@ class RouteManager
     /**
      * @var string
      */
-    protected $namespace = 'App\Http\Controllers\Controller';
+    protected $namespace = 'App\Http\Controllers';
     
     /**
      * 路由文件路径(目录/文件)
