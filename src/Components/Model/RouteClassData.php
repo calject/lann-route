@@ -17,7 +17,7 @@ class RouteClassData extends AbsRouteData
     /**
      * @var string
      */
-    protected $file;
+    protected $file = '';
     
     /**
      * @param string $file
@@ -35,6 +35,22 @@ class RouteClassData extends AbsRouteData
     public function getFile(): string
     {
         return $this->file;
+    }
+    
+    /**
+     * @return array
+     */
+    public function toGroupArray(): array
+    {
+        $group = [];
+        if ($prefix = $this->getPrefix()) {
+            $group['prefix'] = $prefix;
+            $group['as'] = $prefix;
+        }
+        if ($middleware = $this->getMiddleware()) {
+            $group['middleware'] = $middleware;
+        }
+        return $group;
     }
     
 }

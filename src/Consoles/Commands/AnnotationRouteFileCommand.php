@@ -47,31 +47,80 @@ class AnnotationRouteFileCommand extends Command
      */
     public function handle()
     {
+        $isForce = true;
         $optPath = $this->getOption('path', app_path('Http/Controllers'));
         $optEnv = $this->getOption('env', app('env'));
         $routeManager = new RouteManager($optPath);
         array_map(function (RouteFile $routeFile) use ($optEnv, $routeManager, &$files) {
             $classRoute = $routeFile->getRouteClass();
             $methodRoutes = $routeFile->getRouteFunctions();
-            if (!RouteDataHelper::checkEnvs($optEnv, $classRoute)) {
+            $filePath = $classRoute->getFile();
+            if (!RouteDataHelper::checkEnvs($optEnv, $classRoute) || !$filePath) {
                 return;
             }
-            $filePath = $classRoute->getFile();
-            // TODO: get route file group
-            
-            // TODO: write
+            $filePath = base_path('routes/' . ltrim(rtrim($filePath, '.php'), '/') . '.php');
+            $content = "<?php \n\n";
+            $isGroup = false;
+            if ($group = $classRoute->toGroupArray()) {
+                $content .= "Route::group(" . $this->arrayToStr($group) . ", function () {\n";
+                $isGroup = true;
+            }
+            foreach ($methodRoutes as $methodRoute) {
+                if (count($methods = $methodRoute->getMethod()) > 1) {
+                    $routeStr = 'Route::match(' . $this->arrayToStr($methods) . ', ';
+                } elseif (isset($methods[0])) {
+                    $routeStr = 'Route::' . $methods[0] . '(';
+                } else {
+                    continue;
+                }
+                foreach ($methodRoute->getUri() as $uri) {
+                    $content .= $isGroup ? str_repeat(' ', 4) : '';
+                    $content .= $routeStr . "'$uri', '" . $methodRoute->getAction() . "');\n";
+                }
+            }
+            if ($isGroup) {
+                $content .= '});';
+            }
+            $files[$filePath] = $content;
             
         }, $routeManager->getRouteFiles());
         
         if ($files) {
             foreach ($files as $path => $content ) {
-                if (file_exists($path)) {
+                if (!$isForce && file_exists($path)) {
                     echo "文件{$path}已存在.";
-                } else {
+                } elseif($content) {
+                    $this->mkdir(dirname($path));
                     file_put_contents($path, $content);
                 }
             }
+        } else {
+            echo "生成路由文件失败";
         }
+    }
+    
+    /**
+     * @param array $array
+     * @return mixed
+     */
+    protected function arrayToStr(array $array)
+    {
+        return str_replace('}', ']',
+            str_replace('{', '[',
+                str_replace(':', ' => ', json_encode($array, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
+            )
+        );
+    
+    }
+    
+    /**
+     * 递归创建目录
+     * @param string $dir
+     * @return bool
+     */
+    protected function mkdir($dir)
+    {
+        return is_dir($dir) || $this->mkdir(dirname($dir)) && mkdir($dir, 0755);
     }
     
     /**
