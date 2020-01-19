@@ -6,9 +6,13 @@
 
 namespace Calject\LannRoute\Consoles\Commands;
 
+use Calject\LannRoute\Components\Content\ClassCallContent;
+use Calject\LannRoute\Components\Content\PhpFileContent;
 use Calject\LannRoute\Components\Model\RouteFile;
 use Calject\LannRoute\Components\RouteManager;
+use Calject\LannRoute\Content\Components\CommentContent;
 use Calject\LannRoute\Helper\RouteDataHelper;
+use Calject\LannRoute\Utils\StrUtil;
 use Illuminate\Console\Command;
 
 /**
@@ -60,36 +64,45 @@ class AnnotationRouteFileCommand extends Command
                 return;
             }
             $filePath = base_path('routes/' . ltrim(str_replace('.php', '', $filePath), '/') . '.php');
-            $content = ($files[$filePath] ?? "<?php") . "\n\n";
-            $content .= '// ' . $classRoute->getClass() . "\n";
-            $funcContent = '';
+            $fileContent = PhpFileContent::make($files[$filePath] ?? '');
+            $fileContent->append(CommentContent::make([
+                'Class' => StrUtil::rightTo($classRoute->getClass(), '\\'),
+                '@package' => StrUtil::leftTo($classRoute->getClass(), '\\')
+            ]), 0, false);
+            
             if ($isGroup = (bool)($group = $classRoute->toGroupArray())) {
-                $content .= "Route::group(" . str_replace(',', ', ', $this->arrayToStr($group)) . ", function () {\n";
+                $fileContent->append("Route::group(" . StrUtil::arrayToStr($group) . ", function () {");
             }
             usort($methodRoutes, function ($item1, $item2) {
                 return count($item1->getMethod()) > count($item2->getMethod());
             });
             foreach ($methodRoutes as $methodRoute) {
                 if (count($methods = $methodRoute->getMethod()) > 1) {
-                    $routeStr = 'Route::match(' . $this->arrayToStr($methods) . ', ';
+                    $method = 'match';
+                    $params = [$methods];
                 } elseif (isset($methods[0])) {
-                    $routeStr = 'Route::' . $methods[0] . '(';
+                    $method = $methods[0];
+                    $params = [];
                 } else {
                     continue;
                 }
                 foreach ($methodRoute->getUri() as $uri) {
+                    $route = ClassCallContent::make('Route', $space, (int)$isGroup);
                     if ($des = $methodRoute->getDes()) {
-                        $funcContent .= $isGroup ? $space : '';
-                        $funcContent .= '// ' . str_replace("\n", "\n" . $space, $des) . "\n";
+                        $route->setIndentContentHeadNext('//' . str_replace("\n", "\n" . $space, $des));
                     }
-                    $funcContent .= $isGroup ? $space : '';
-                    $funcContent .= $routeStr . "'$uri', '" . str_replace($classRoute->getRealNamespace().'\\', '', $methodRoute->getAction()) . "')";
-                    $funcContent .= ($methodRoute->getName() ? '->name(\'' . $methodRoute->getName() . '\')' : '') . ";\n";
+                    $route->staticFunc($method, array_merge_recursive(
+                        $params,
+                        [$uri, str_replace($classRoute->getRealNamespace().'\\', '', $methodRoute->getAction())]
+                    ));
+                    $methodRoute->getName() && $route->func('name', [$methodRoute->getName()]);
+                    $fileContent->append($route);
+                    unset($route);
                 }
             }
-            if ($funcContent) {
-                $files[$filePath] = $content . $funcContent . ($isGroup ? '});' : '');
-            }
+            $isGroup && $fileContent->append('});');
+            $files[$filePath] = $fileContent->toContent();
+            unset($fileContent);
             
         }, $routeManager->getRouteFiles());
         
@@ -105,20 +118,6 @@ class AnnotationRouteFileCommand extends Command
         } else {
             echo "生成路由文件失败";
         }
-    }
-    
-    /**
-     * @param array $array
-     * @return mixed
-     */
-    protected function arrayToStr(array $array)
-    {
-        return str_replace('}', ']',
-            str_replace('{', '[',
-                str_replace(':', ' => ', json_encode($array, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE))
-            )
-        );
-    
     }
     
     /**
