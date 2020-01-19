@@ -20,29 +20,29 @@
 * [二、安装](#二安装-top)
 * [三、使用](#三使用-top)
     * [Class Annotation Tag](#class-annotation-tag)
-        * [@group](#group)
-        * [@env](#env)
-        * [@prefix](#prefix)
-        * [@middleware](#middleware)
-        * [@any](#any)
-        * [@restful](#restful)
-        * [@get](#get)
-        * [@post](#post)
-        * [@put](#put)
-        * [@delete](#delete)
+        * [@group](#group) route group
+        * [@env](#env) 设置路由生效环境
+        * [@prefix](#prefix) route prefix
+        * [@middleware](#middleware) route middleware
+        * [@any](#any) 设置当前控制器请求方式默认为any
+        * [@restful](#restful) 设置当前控制器请求方式默认为restful(get|post|put|delete)
+        * [@get](#get) 设置当前控制器请求方式默认为get
+        * [@post](#post) 设置当前控制器请求方式默认为post
+        * [@put](#put) 设置当前控制器请求方式默认为put
+        * [@delete](#delete) 设置当前控制器请求方式默认为delete
     * [Function Annotation Tag](#function-annotation-tag)
-        * [@uri](#uri)
-        * [@name](#name)
-        * [@des](#des)
-        * [@env](#env-1)
-        * [@prefix](#prefix-1)
-        * [@middleware](#middleware-1)
-        * [@any](#any-1)
-        * [@restful](#restful-1)
-        * [@get](#get-1)
-        * [@post](#post-1)
-        * [@put](#put-1)
-        * [@delete](#delete-1)
+        * [@uri](#uri) 设置请求方法的请求路径
+        * [@name](#name) 设置路由别名
+        * [@des](#des) 添加路由描述
+        * [@env](#env-1) 设置当前请求方法生效环境
+        * [@prefix](#prefix-1) route prefix
+        * [@middleware](#middleware-1) route middleware
+        * [@any](#any-1) 设置当前路由请求方式为any
+        * [@restful](#restful-1) 设置当前路由请求方式为restful(get|post|put|delete)
+        * [@get](#get-1) 设置当前路由请求方式为get
+        * [@post](#post-1) 设置当前路由请求方式为post
+        * [@put](#put-1) 设置当前路由请求方式为put
+        * [@delete](#delete-1) 设置当前路由请求方式为delete
 * [四、拓展](#expand)
 
 ## <span id="introduce">一、介绍</span> [top](#lann-route)
