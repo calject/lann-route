@@ -7,6 +7,12 @@
 
 ### v1.0
 
+* 基础版本(通过注解(doc注释)自动解析路由文件)
+
+### v1.1
+
+* 添加`php artisan calject:route:file` 命令根据注解(doc注释)生成路由文件
+
 
 ## **Table of Contents**
 
@@ -15,8 +21,10 @@
 * [三、使用](#三使用-top)
     * [Class Annotation Tag](#class-annotation-tag)
         * [@group](#group)
+        * [@env](#env)
         * [@prefix](#prefix)
         * [@middleware](#middleware)
+        * [@any](#any)
         * [@restful](#restful)
         * [@get](#get)
         * [@post](#post)
@@ -25,8 +33,11 @@
     * [Function Annotation Tag](#function-annotation-tag)
         * [@uri](#uri)
         * [@name](#name)
+        * [@des](#des)
+        * [@env](#env-1)
         * [@prefix](#prefix-1)
         * [@middleware](#middleware-1)
+        * [@any](#any-1)
         * [@restful](#restful-1)
         * [@get](#get-1)
         * [@post](#post-1)
@@ -197,14 +208,28 @@ class TestController extends Controller
 * 示例1: `@group(method='get', prefix='query', middleware='api_query')`
 * 示例2: `@group(method='get,post,put,delete', prefix='test')`
 
+#### <span id="c-env">`@env(...)`</span>
+* `@env('local')` 添加访问环境限制
+* 示例1: @env('local')    local环境生效
+* 示例2: @env(all)        所有环境生效
+* 示例2: @env(local, develop, feature) [local,develop,feature]环境生效
+
 #### <span id="c-prefix">`@prefix(...)`</span>
 * `@prefix('string')` 添加请求前缀
-* 示例 @prefix('test')
+* 示例: @prefix('test')
 
 #### <span id="c-middleware">`@middleware(...)`</span>
 * `@middleware('array')` 添加请求中间件
 * 示例1: `@middleware('api')`
 * 示例2: `@middleware('api, query')`
+
+#### <span id="c-any">`@any(...)`</span>
+* `@any()`  添加restful定义，等同于`@method('get,post,put,delete,...')`
+* `@any(xxx='xxx',xxx='xxx',...)`
+    * `prefix`[string] : 前缀
+    * `middleware`[array] : 请求中间件
+* 示例1: `@any()`
+* 示例2: `@any(prefix='api', middleware='api')`
 
 #### <span id="c-restful">`@restful(...)`</span>
 * `@restful()`  添加restful定义，等同于`@method('get,post,put,delete')`
@@ -258,14 +283,32 @@ class TestController extends Controller
 * `@name('string')` 添加别名
 * 示例 @name('test')
 
+#### <span id="c-des">`@des(...)`</span>
+* `@des('路由描述')` 生成路由文件的路由描述
+* 示例1: @env('请求测试')
+
+#### <span id="c-env">`@env(...)`</span>
+* `@env('local')` 添加访问环境限制
+* 示例1: @env('local')    local环境生效
+* 示例2: @env(all)        所有环境生效
+* 示例2: @env(local, develop, feature) [local,develop,feature]环境生效
+
 #### <span id="f-prefix">`@prefix(...)`</span>
 * `@prefix('string')` 添加请求前缀
-* 示例 @prefix('test')
+* 示例: @prefix('test')
 
 #### <span id="f-middleware">`@middleware(...)`</span>
 * `@middleware('array')` 添加请求中间件
 * 示例1: `@middleware('api')`
 * 示例2: `@middleware('api, query')`
+
+#### <span id="c-any">`@any(...)`</span>
+* `@any()`  添加restful定义，等同于`@method('get,post,put,delete,...')`
+* `@any(xxx='xxx',xxx='xxx',...)`
+    * `prefix`[string] : 前缀
+    * `middleware`[array] : 请求中间件
+* 示例1: `@any()`
+* 示例2: `@any(prefix='api', middleware='api')`
 
 #### <span id="f-restful">`@restful(...)`</span>
 * `@restful()`      添加restful定义，等同于`@method('get,post,put,delete')`
