@@ -13,6 +13,47 @@
 
 * 添加`php artisan calject:route:file` 命令根据注解(doc注释)生成路由文件
 
+```
+Description:
+  根据注解路由生成路由文件
+
+Usage:
+  calject:route:file [options]
+
+Options:
+      --path[=PATH]     设置扫描的路径参数(目录/具体路由文件)，默认为app/Http/Controllers
+      --env[=ENV]       设置生成的env环境路由,仅生成参数内配置的env路由,多个环境以,分割(例: local,develop),默认不检查@env(...)
+      --force           是否强制生成文件，将覆盖原有文件,默认已存在的文件不重复生成
+```
+
+* 路由生成示例(routes/test.php)
+
+```php
+<?php
+
+/**
+ * Class UploadController
+ * @package App\Http\Controllers\Annotation
+ */
+Route::group(["prefix" => "file", "namespace" => "Annotation"], function () {
+    // 文件上传
+    Route::post('upload', 'UploadController@upload');
+    // 文件下载
+    Route::get('download', 'UploadController@download');
+});
+
+/**
+ * Class TestController
+ * @package App\Http\Controllers\Annotation
+ */
+Route::group(["prefix" => "annotation", "middleware" => ["api"], "namespace" => "Annotation"], function () {
+    Route::get('getPath', 'TestController@getPath');
+    Route::post('setPath', 'TestController@setPath');
+    Route::match(["get", "post", "put", "delete"], 'user', 'TestController@user')->name('user');
+    Route::match(["get", "post", "put", "delete"], 'file', 'TestController@file');
+    Route::match(["get", "post", "put", "delete"], 'article', 'TestController@article');
+});
+```
 
 ## **Table of Contents**
 
