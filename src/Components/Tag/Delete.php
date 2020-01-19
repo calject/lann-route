@@ -6,7 +6,6 @@
 
 namespace Calject\LannRoute\Components\Tag;
 
-
 use Calject\LannRoute\Constant\RouteConstant;
 use Calject\LannRoute\Contracts\AbsAnnotationMethodTag;
 

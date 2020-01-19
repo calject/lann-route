@@ -6,7 +6,6 @@
 
 namespace Calject\LannRoute\Components\Tag;
 
-
 use Calject\LannRoute\Components\Model\RouteClassData;
 use Calject\LannRoute\Components\Model\RouteFuncData;
 use Calject\LannRoute\Constant\RouteConstant;

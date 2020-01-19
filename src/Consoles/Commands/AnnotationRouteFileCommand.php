@@ -51,7 +51,8 @@ class AnnotationRouteFileCommand extends Command
         $optPath = $this->getOption('path', app_path('Http/Controllers'));
         $optEnv = $this->getOption('env', app('env'));
         $routeManager = new RouteManager($optPath);
-        array_map(function (RouteFile $routeFile) use ($optEnv, $routeManager, &$files) {
+        $space = str_repeat(' ', 4);
+        array_map(function (RouteFile $routeFile) use ($optEnv, $routeManager, &$files, $space) {
             $classRoute = $routeFile->getRouteClass();
             $methodRoutes = $routeFile->getRouteFunctions();
             $filePath = $classRoute->getFile();
@@ -77,7 +78,11 @@ class AnnotationRouteFileCommand extends Command
                     continue;
                 }
                 foreach ($methodRoute->getUri() as $uri) {
-                    $funcContent .= $isGroup ? str_repeat(' ', 4) : '';
+                    if ($des = $methodRoute->getDes()) {
+                        $funcContent .= $isGroup ? $space : '';
+                        $funcContent .= '// ' . str_replace("\n", "\n" . $space, $des) . "\n";
+                    }
+                    $funcContent .= $isGroup ? $space : '';
                     $funcContent .= $routeStr . "'$uri', '" . str_replace($classRoute->getRealNamespace().'\\', '', $methodRoute->getAction()) . "')";
                     $funcContent .= ($methodRoute->getName() ? '->name(\'' . $methodRoute->getName() . '\')' : '') . ";\n";
                 }

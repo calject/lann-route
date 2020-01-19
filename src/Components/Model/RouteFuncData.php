@@ -32,6 +32,12 @@ class RouteFuncData extends AbsRouteData
     protected $name = '';
     
     /**
+     * 路由描述
+     * @var string
+     */
+    protected $des = '';
+    
+    /**
      * init
      * @return mixed|void
      */
@@ -70,6 +76,15 @@ class RouteFuncData extends AbsRouteData
         return $this;
     }
     
+    /**
+     * @param string $des
+     * @return $this
+     */
+    public function des(string $des)
+    {
+        $this->des = $des;
+        return $this;
+    }
     
     /*---------------------------------------------- get ----------------------------------------------*/
     
@@ -95,6 +110,14 @@ class RouteFuncData extends AbsRouteData
     public function getName(): string
     {
         return $this->name;
+    }
+    
+    /**
+     * @return string
+     */
+    public function getDes(): string
+    {
+        return $this->des;
     }
     
 }

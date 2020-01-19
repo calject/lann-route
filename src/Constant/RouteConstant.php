@@ -12,6 +12,10 @@ namespace Calject\LannRoute\Constant;
  */
 interface RouteConstant
 {
+    const NONE = 'none';
+    
+    const ENV_NONE = 'null';
+    
     const SCOPE_CLASS = 'class';
     const SCOPE_FUNCTION = 'function';
     const SCOPE_ALL = [self::SCOPE_CLASS, self::SCOPE_FUNCTION];
