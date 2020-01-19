@@ -58,13 +58,16 @@ class AnnotationRouteFileCommand extends Command
             if (!RouteDataHelper::checkEnvs($optEnv, $classRoute) || !$filePath) {
                 return;
             }
-            $filePath = base_path('routes/' . ltrim(rtrim($filePath, '.php'), '/') . '.php');
-            $content = "<?php \n\n";
-            $isGroup = false;
-            if ($group = $classRoute->toGroupArray()) {
-                $content .= "Route::group(" . $this->arrayToStr($group) . ", function () {\n";
-                $isGroup = true;
+            $filePath = base_path('routes/' . ltrim(str_replace('.php', '', $filePath), '/') . '.php');
+            $content = ($files[$filePath] ?? "<?php") . "\n\n";
+            $content .= '// ' . $classRoute->getClass() . "\n";
+            $funcContent = '';
+            if ($isGroup = (bool)($group = $classRoute->toGroupArray())) {
+                $content .= "Route::group(" . str_replace(',', ', ', $this->arrayToStr($group)) . ", function () {\n";
             }
+            usort($methodRoutes, function ($item1, $item2) {
+                return count($item1->getMethod()) > count($item2->getMethod());
+            });
             foreach ($methodRoutes as $methodRoute) {
                 if (count($methods = $methodRoute->getMethod()) > 1) {
                     $routeStr = 'Route::match(' . $this->arrayToStr($methods) . ', ';
@@ -74,14 +77,14 @@ class AnnotationRouteFileCommand extends Command
                     continue;
                 }
                 foreach ($methodRoute->getUri() as $uri) {
-                    $content .= $isGroup ? str_repeat(' ', 4) : '';
-                    $content .= $routeStr . "'$uri', '" . $methodRoute->getAction() . "');\n";
+                    $funcContent .= $isGroup ? str_repeat(' ', 4) : '';
+                    $funcContent .= $routeStr . "'$uri', '" . str_replace($classRoute->getRealNamespace().'\\', '', $methodRoute->getAction()) . "')";
+                    $funcContent .= ($methodRoute->getName() ? '->name(\'' . $methodRoute->getName() . '\')' : '') . ";\n";
                 }
             }
-            if ($isGroup) {
-                $content .= '});';
+            if ($funcContent) {
+                $files[$filePath] = $content . $funcContent . ($isGroup ? '});' : '');
             }
-            $files[$filePath] = $content;
             
         }, $routeManager->getRouteFiles());
         
@@ -89,7 +92,7 @@ class AnnotationRouteFileCommand extends Command
             foreach ($files as $path => $content ) {
                 if (!$isForce && file_exists($path)) {
                     echo "文件{$path}已存在.";
-                } elseif($content) {
+                } else {
                     $this->mkdir(dirname($path));
                     file_put_contents($path, $content);
                 }

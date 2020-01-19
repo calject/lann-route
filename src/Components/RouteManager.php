@@ -91,6 +91,9 @@ class RouteManager
                 /* ======== 解析路由注解 ======== */
                 $refClass = new ReflectionClass($className);
                 /* ======== 处理class tags ======== */
+                $classTagData->class($className);
+                $classTagData->namespace($refClass->getNamespaceName());
+                $classTagData->realNamespace(trim(str_replace($this->namespace, '', $refClass->getNamespaceName()), '\\'));
                 $this->tagHandle($refClass->getDocComment(), RouteConstant::SCOPE_CLASS, $classTagData);
                 array_map(function (ReflectionMethod $refMethod) use (&$methodRoutes, $className, $classTagData) {
                     if ($refMethod->isPublic() && $refMethod->class == $className) {
