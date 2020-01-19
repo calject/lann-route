@@ -37,6 +37,7 @@ class AnnotationRouteFileCommand extends Command
     protected $signature = 'calject:route:file
         {--path= : 设置扫描的路径参数(目录/具体路由文件)，默认为app/Http/Controllers}
         {--env= : 设置生成的env环境路由,仅生成参数内配置的env路由,多个环境以,分割(例: local,develop),默认不检查@env(...)}
+        {--force : 是否强制生成文件，将覆盖原有文件,默认已存在的文件不重复生成}
     ';
     
     /**
@@ -51,7 +52,7 @@ class AnnotationRouteFileCommand extends Command
      */
     public function handle()
     {
-        $isForce = true;
+        $isForce = $this->getOption('force');
         $optPath = $this->getOption('path', app_path('Http/Controllers'));
         $optEnv = $this->getOption('env', app('env'));
         $routeManager = new RouteManager($optPath);
@@ -108,10 +109,12 @@ class AnnotationRouteFileCommand extends Command
         
         if ($files) {
             foreach ($files as $path => $content ) {
+                $realpath = str_replace(base_path('routes') . '/', '', $path);
                 if (!$isForce && file_exists($path)) {
-                    echo "文件{$path}已存在.";
+                    $this->line("生成路由文件[n]: $realpath 文件已存在, 使用--force参数强制覆盖.");
                 } else {
                     $this->mkdir(dirname($path));
+                    $this->info('生成路由文件[y]: ' . $realpath);
                     file_put_contents($path, $content);
                 }
             }
