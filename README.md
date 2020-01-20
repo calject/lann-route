@@ -63,6 +63,7 @@ Route::group(["prefix" => "annotation", "middleware" => ["api"], "namespace" => 
 * [二、安装](#二安装-top)
 * [三、使用](#三使用-top)
     * [Class Annotation Tag](#class-annotation-tag)
+        * [@file](#file) 设置生成路由文件名
         * [@group](#group) route group
         * [@env](#env) 设置路由生效环境
         * [@prefix](#prefix) route prefix
@@ -238,6 +239,12 @@ class TestController extends Controller
 
 > 类注解(作用于所有类方法上,方法上定义同类型tag覆盖类定义)
 
+#### <span id="c-file">`@file(...)`</span>
+* `@file('filePath')` 设置生成的路由文件名(可忽略后缀)
+* 示例1: @file('route.php') 生成路由文件为routes目录下route.php文件
+* 示例2: @file(article) 生成路由文件为routes目录下article.php文件
+* 示例3: @file(test/article) 生成路由文件为routes/test目录下article.php文件
+
 #### <span id="c-group">`@group(...)`</span>
 * `@group(xxx='xxx',xxx='xxx',...)`
     * `prefix`[string] : 前缀
@@ -255,7 +262,7 @@ class TestController extends Controller
 * `@env('local')` 添加访问环境限制
 * 示例1: @env('local')    local环境生效
 * 示例2: @env(all)        所有环境生效
-* 示例2: @env(local, develop, feature) [local,develop,feature]环境生效
+* 示例3: @env(local, develop, feature) [local,develop,feature]环境生效
 
 #### <span id="c-prefix">`@prefix(...)`</span>
 * `@prefix('string')` 添加请求前缀
@@ -334,7 +341,7 @@ class TestController extends Controller
 * `@env('local')` 添加访问环境限制
 * 示例1: @env('local')    local环境生效
 * 示例2: @env(all)        所有环境生效
-* 示例2: @env(local, develop, feature) [local,develop,feature]环境生效
+* 示例3: @env(local, develop, feature) [local,develop,feature]环境生效
 
 #### <span id="f-prefix">`@prefix(...)`</span>
 * `@prefix('string')` 添加请求前缀
