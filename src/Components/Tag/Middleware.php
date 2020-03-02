@@ -14,7 +14,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationTag;
 /**
  * Class Middleware
  * @package Calject\LannRoute\Components\Tag
- * @example middleware(xxx) | middleware(xxx, xxx, ...) | middleware('xxx,xxx,...')
+ * @example @middleware(xxx) | @middleware(xxx, xxx, ...) | @middleware('xxx,xxx,...')
  */
 class Middleware extends AbsAnnotationTag
 {

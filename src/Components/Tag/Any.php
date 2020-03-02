@@ -12,7 +12,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationMethodTag;
 /**
  * Class Any
  * @package Calject\LannRoute\Components\Tag
- * @example any() | any('[uri]') | any(prefix='xxx', middleware='xxx', ...)
+ * @example @any() | @any('[uri]') | @any(prefix='xxx', middleware='xxx', ...)
  */
 class Any extends AbsAnnotationMethodTag
 {

@@ -14,7 +14,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationTag;
 /**
  * Class Prefix
  * @package Calject\LannRoute\Components\Tag
- * @example prefix(xxx) | prefix('xxx')
+ * @example @prefix(xxx) | @prefix('xxx')
  */
 class Prefix extends AbsAnnotationTag
 {

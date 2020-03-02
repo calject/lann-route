@@ -14,7 +14,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationTag;
 /**
  * Class Api
  * @package Calject\LannRoute\Components\Tag
- * @example api(method='get', name='api', ...) | api(method='get,post,..', middleware='api,...')
+ * @example @api(method='get', name='api', ...) | @api(method='get,post,..', middleware='api,...')
  */
 class Api extends AbsAnnotationTag
 {

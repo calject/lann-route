@@ -14,7 +14,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationTag;
 /**
  * Class Group
  * @package Calject\LannRoute\Components\Tag
- * @example group(method='get,post,put,delete', prefix='xxx', middleware='xxx,...') | group(prefix='xxx')
+ * @example @group(method='get,post,put,delete', prefix='xxx', middleware='xxx,...') | @group(prefix='xxx')
  */
 class Group extends AbsAnnotationTag
 {

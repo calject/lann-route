@@ -12,7 +12,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationMethodTag;
 /**
  * Class Restful
  * @package Calject\LannRoute\Components\Tag
- * @example restful() | restful('[uri]') | restful(prefix='xxx', middleware='xxx', ...)
+ * @example @restful() | @restful('[uri]') | @restful(prefix='xxx', middleware='xxx', ...)
  */
 class Restful extends AbsAnnotationMethodTag
 {

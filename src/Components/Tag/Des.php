@@ -14,7 +14,7 @@ use Calject\LannRoute\Contracts\AbsAnnotationTag;
 /**
  * Class Des
  * @package Calject\LannRoute\Components\Tag
- * @example name(路由描述) | name('路由描述')
+ * @example @des(路由描述) | @des('路由描述')
  */
 class Des extends AbsAnnotationTag
 {
